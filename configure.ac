@@ -247,8 +247,16 @@ if test "x$enable_atomic_arm_memory_barrier" = "xyes"; then
     AC_DEFINE_UNQUOTED(ATOMIC_ARM_MEMORY_BARRIER_ENABLED, 1, [Enable memory barriers])
 fi
 
+AC_ARG_ENABLE([libatomic-ops],
+    AS_HELP_STRING([--disable-libatomic-ops],[force disable usage of libatomic_ops]))
+
 # If everything else fails use libatomic_ops
 need_libatomic_ops=yes
+
+if test "x$enable_libatomic_ops" = "xno" ; then
+    AC_MSG_NOTICE([usage of libatomic_ops disabled])
+    need_libatomic_ops=no
+fi
 
 AC_CACHE_CHECK([whether $CC knows __sync_bool_compare_and_swap()],
     pulseaudio_cv_sync_bool_compare_and_swap, [
@@ -621,6 +629,9 @@ AS_IF([test "x$enable_memfd" = "xyes" && test "x$HAVE_MEMFD" = "x0"],
     [AC_MSG_ERROR([*** Your Linux kernel does not support memfd shared memory.
                   *** Use linux v3.17 or higher for such a feature.])])
 
+AS_IF([test "x$HAVE_MEMFD" = "x1"],
+    AC_CHECK_FUNCS([memfd_create]))
+
 AC_SUBST(HAVE_MEMFD)
 AM_CONDITIONAL([HAVE_MEMFD], [test "x$HAVE_MEMFD" = x1])
 AS_IF([test "x$HAVE_MEMFD" = "x1"], AC_DEFINE([HAVE_MEMFD], 1, [Have memfd shared memory.]))
@@ -846,6 +857,28 @@ AC_SUBST(HAVE_ALSA)
 AM_CONDITIONAL([HAVE_ALSA], [test "x$HAVE_ALSA" = x1])
 AS_IF([test "x$HAVE_ALSA" = "x1"], AC_DEFINE([HAVE_ALSA], 1, [Have ALSA?]))
 AS_IF([test "x$HAVE_ALSA_UCM" = "x1"], AC_DEFINE([HAVE_ALSA_UCM], 1, [Have ALSA UCM?]))
+
+### palm resampler ####
+
+AC_ARG_ENABLE([palm-resampler],
+    AS_HELP_STRING([--enable-palm-resampler], [Enable palm resampler support]))
+
+AS_IF([test "x$enable_palm_resampler" = "xyes"], HAVE_PALM_RESAMPLER=1, HAVE_PALM_RESAMPLER=0)
+
+AC_SUBST(HAVE_PALM_RESAMPLER)
+AM_CONDITIONAL([HAVE_PALM_RESAMPLER], [test "x$HAVE_PALM_RESAMPLER" = x1])
+AS_IF([test "x$HAVE_PALM_RESAMPLER" = "x1"], AC_DEFINE([HAVE_PALM_RESAMPLER], 1, [Have PALM_RESAMPLER?]))
+
+### raspberrypi ####
+
+AC_ARG_ENABLE([rpi],
+    AS_HELP_STRING([--enable-rpi], [Enable raspberrypi support]))
+
+AS_IF([test "x$enable_rpi" = "xyes"], RPI=1, RPI=0)
+
+AC_SUBST(RPI)
+AM_CONDITIONAL([RPI], [test "x$RPI" = x1])
+AS_IF([test "x$RPI" = "x1"], AC_DEFINE([RPI], 1, [Have RPI=1?]))
 
 #### EsounD support (optional) ####
 

@@ -2095,6 +2095,7 @@ bool pa_sink_input_safe_to_remove(pa_sink_input *i) {
 }
 
 /* Called from IO context */
+#ifdef PALM_UNMODIFIED_CODE
 void pa_sink_input_request_rewind(
         pa_sink_input *i,
         size_t nbytes  /* in our sample spec */,
@@ -2184,6 +2185,16 @@ void pa_sink_input_request_rewind(
             pa_sink_request_rewind(i->sink, 0);
     }
 }
+#else
+void pa_sink_input_request_rewind(
+        pa_sink_input *i,
+        size_t nbytes  /* in our sample spec */,
+        bool rewrite,
+        bool flush,
+        bool dont_rewind_render) {
+    pa_log_debug("Do not do any rewind requests, seems to cause loss of audio samples");
+}
+#endif
 
 /* Called from main context */
 pa_memchunk* pa_sink_input_get_silence(pa_sink_input *i, pa_memchunk *ret) {

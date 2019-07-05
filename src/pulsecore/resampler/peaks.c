@@ -25,7 +25,7 @@
 #include <math.h>
 
 #include <pulsecore/resampler.h>
-
+#if 0
 struct peaks_data { /* data specific to the peak finder pseudo resampler */
     unsigned o_counter;
     unsigned i_counter;
@@ -33,7 +33,7 @@ struct peaks_data { /* data specific to the peak finder pseudo resampler */
     float max_f[PA_CHANNELS_MAX];
     int16_t max_i[PA_CHANNELS_MAX];
 };
-
+#endif
 static unsigned peaks_resample(pa_resampler *r, const pa_memchunk *input, unsigned in_n_frames, pa_memchunk *output, unsigned *out_n_frames) {
     unsigned c, o_index = 0;
     unsigned i, i_end = 0;

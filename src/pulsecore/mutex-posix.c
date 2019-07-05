@@ -49,6 +49,9 @@ pa_mutex* pa_mutex_new(bool recursive, bool inherit_priority) {
     if (recursive)
         pa_assert_se(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) == 0);
 
+#ifdef PALM_UNMODIFIED_CODE
+/* Palm (15/4/08): It seems like PRIO_INHERIT doesn't work on ARM, causing
+ * a hang in pthread_cond_wait() */
 #ifdef HAVE_PTHREAD_PRIO_INHERIT
     if (inherit_priority) {
         r = pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
@@ -73,6 +76,10 @@ pa_mutex* pa_mutex_new(bool recursive, bool inherit_priority) {
         pa_assert_se(pthread_mutex_init(&m->mutex, &attr) == 0);
     }
 #endif
+#else
+    m = pa_xnew(pa_mutex, 1);
+    pa_assert_se(pthread_mutex_init(&m->mutex, &attr) == 0);
+#endif /*PALM_UNMODIFIED_CODE*/
 
     return m;
 }

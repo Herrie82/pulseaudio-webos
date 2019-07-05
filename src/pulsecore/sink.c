@@ -2562,8 +2562,11 @@ int pa_sink_process_msg(pa_msgobject *o, int code, void *userdata, int64_t offse
 
             pa_hashmap_remove_and_free(s->thread_info.inputs, PA_UINT32_TO_PTR(i->index));
             pa_sink_invalidate_requested_latency(s, true);
-            pa_sink_request_rewind(s, (size_t) -1);
 
+            /* Do not do rewind causing delay in removing input */
+#ifdef PALM_UNMODIFIED_CODE
+            pa_sink_request_rewind(s, (size_t) -1);
+#endif
             /* In flat volume mode we need to update the volume as
              * well */
             return o->process_msg(o, PA_SINK_MESSAGE_SET_SHARED_VOLUME, NULL, 0, NULL);
